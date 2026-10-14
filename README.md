@@ -69,6 +69,10 @@ Designed to stay well inside Cloudflare Workers' **free tier** and Open-Meteo's 
 - On-demand any-city search → geocode → pin (persisted in `localStorage`).
 - All external strings rendered via `textContent` (XSS-safe).
 - Served cross-origin; consuming sites allowlist the host in CSP `script-src` + `connect-src`.
+- **Resilience:** if the Worker payload has no readings (its shared egress IP hit Open-Meteo's daily
+  cap), the widget fetches Open-Meteo **directly from the visitor's own IP** (bounded concurrency +
+  per-request timeout, city list from `GET /api/cities`) and rotates from that — so it still renders.
+  Consuming sites must allow `api.open-meteo.com` + `air-quality-api.open-meteo.com` in CSP `connect-src`.
 
 ## Attribution (required)
 
