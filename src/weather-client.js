@@ -83,7 +83,7 @@
       "padding:7px 9px;font:inherit;font-size:12px;cursor:pointer;color:inherit;}" +
     ".res button:hover{background:rgba(127,160,175,.14);}" +
     ".res .c{color:var(--wx-soft,#5b7280);font-size:11px;}" +
-    "@media (prefers-color-scheme:dark){:host{--wx-ink:#e7eef2;--wx-soft:#9fb3bd;--wx-bg:#1b2429;--wx-line:#33454e;}}" +
+    ":host(.wx-dark){--wx-ink:#e7eef2;--wx-soft:#9fb3bd;--wx-bg:#1b2429;--wx-line:#33454e;}" +
     "@media (max-width:640px){.wx{min-width:0;}.city{max-width:88px;}.h{display:none;}}";
 
   function el(tag, cls, txt) {
@@ -118,6 +118,18 @@
     wrap.appendChild(box);
     root.appendChild(style);
     root.appendChild(wrap);
+
+    // Follow the HOST PAGE's theme (not the OS): the sites toggle a dark palette
+    // via <html data-theme="gray">, independent of prefers-color-scheme — so an
+    // OS-dark / site-light visitor must still get dark (readable) text.
+    function applyTheme() {
+      var dark = document.documentElement.getAttribute("data-theme") === "gray";
+      if (host.classList) host.classList.toggle("wx-dark", dark);
+    }
+    applyTheme();
+    try {
+      new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    } catch (e) {}
 
     var pins = loadPins();
     var stops = [];
