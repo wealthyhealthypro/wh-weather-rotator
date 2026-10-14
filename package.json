@@ -1,0 +1,11 @@
+{
+  "name": "wh-weather-rotator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Curated weather + AQI rotator: world-city dataset, Cloudflare-Worker data engine, and a drop-in Shadow-DOM header widget (East -> West, flags, nature markers, US-AQI).",
+  "license": "MIT",
+  "scripts": {
+    "build:cities": "node scripts/build-cities.mjs"
+  }
+}

@@ -1,0 +1,27 @@
+# NOTICE — third-party attribution
+
+This project uses the following third-party data and assets. Attribution is
+**required** and must be preserved wherever the data is displayed.
+
+## Weather and air-quality data — Open-Meteo
+
+- Source: Open-Meteo — https://open-meteo.com/
+- Licence: forecast/air-quality API data is provided under the
+  **Creative Commons Attribution 4.0 International (CC BY 4.0)** licence
+  (https://creativecommons.org/licenses/by/4.0/).
+- Required attribution: **"Weather data by Open-Meteo.com"** with a link to
+  https://open-meteo.com/, shown next to any place the data is displayed.
+- Note: the free Open-Meteo API is for **non-commercial** use; commercial use
+  requires a subscription or self-hosting. Verify current terms before commercial use.
+- Air quality derives from the **Copernicus Atmosphere Monitoring Service (CAMS)**
+  (ECMWF / national providers), which must also be credited.
+
+## Location / geocoding data — GeoNames (via Open-Meteo)
+
+- The Open-Meteo Geocoding API is based on **GeoNames** — https://www.geonames.org/
+  (CC BY 4.0).
+
+## Country flags — circle-flags
+
+- Source: HatScripts/circle-flags — https://github.com/HatScripts/circle-flags
+- Licence: **MIT**.
