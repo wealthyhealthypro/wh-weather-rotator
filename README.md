@@ -12,6 +12,9 @@ It powers the header rotator on the WealthyHealthy.Pro family of sites
 > `wealthyhealthypro/wh-macro`) vendors the generated files via its `npm run sync:weather`
 > script — do not hand-edit the copies there.
 
+> **Design & internals:** see [`ARCHITECTURE.md`](ARCHITECTURE.md) for the data flow, caching
+> layers, HTTP contract and per-surface integration.
+
 ## Contents
 
 ```
