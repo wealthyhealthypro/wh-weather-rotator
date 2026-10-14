@@ -51,9 +51,10 @@
 
   var CSS = "" +
     ":host{all:initial;display:inline-block;font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--wx-ink,#243b45);}" +
+    ".root{display:inline-flex;align-items:center;gap:7px;opacity:0;transition:opacity .35s ease;}" +
+    ".root.show{opacity:1;}" +
     ".wx{display:flex;align-items:center;gap:7px;min-height:30px;min-width:210px;white-space:nowrap;" +
-      "font-size:12.5px;line-height:1;overflow:hidden;opacity:0;transition:opacity .35s ease;}" +
-    ".wx.show{opacity:1;}" +
+      "font-size:12.5px;line-height:1;overflow:hidden;}" +
     ".f{width:15px;height:15px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 1px rgba(0,0,0,.12);}" +
     ".ic{width:19px;height:19px;flex:0 0 auto;}" +
     ".ic svg{width:100%;height:100%;display:block;}" +
@@ -113,9 +114,10 @@
     var res = el("div", "res");
     srch.appendChild(btn); srch.appendChild(inp); srch.appendChild(res);
 
+    var wrap = el("div", "root");
+    wrap.appendChild(box);
     root.appendChild(style);
-    root.appendChild(box);
-    root.appendChild(srch);
+    root.appendChild(wrap);
 
     var pins = loadPins();
     var stops = [];
@@ -152,7 +154,8 @@
       if (stop.T != null) box.appendChild(el("span", "t " + tClass(stop.T), Math.round(stop.T) + "\u00B0C"));
       if (stop.h != null) box.appendChild(el("span", "h", Math.round(stop.h) + "% RH"));
       if (stop.a != null) box.appendChild(el("span", "aqi " + aqiClass(stop.a), "AQI " + stop.a));
-      box.classList.add("show");
+      if (!srch.parentNode) wrap.appendChild(srch);
+      wrap.classList.add("show");
     }
 
     function tick() {

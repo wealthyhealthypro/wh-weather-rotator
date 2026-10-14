@@ -50,6 +50,14 @@ let lastAqiAt = 0;
 let callsDay = "";
 let callsToday = 0;
 
+// Shared last-good payload in the Worker Cache API — survives cold isolates and
+// code deploys, so every edge location can serve the last build immediately
+// instead of returning an empty payload while it warms up. This is the tier that
+// makes the rotator reliable without a dashboard Cache Rule.
+const SHARED = "https://wh-weather.internal/payload";
+let lastAttempt = 0;                       // throttle for background refreshes
+const MIN_RETRY_MS = 2 * 60 * 1000;        // never retry a build more often than this
+
 function bumpCall(): boolean {
   const day = new Date().toISOString().slice(0, 10);
   if (day !== callsDay) { callsDay = day; callsToday = 0; }
@@ -73,6 +81,35 @@ async function getJson(url: string, attempts = 2): Promise<unknown> {
     } finally { clearTimeout(t); }
   }
   throw last;
+}
+
+// ── Shared (Cache API) last-good payload ─────────────────────────────────────
+async function loadShared(): Promise<string | null> {
+  if (cache) return cache.body;
+  try {
+    const hit = await caches.default.match(new Request(SHARED));
+    if (!hit) return null;
+    const body = await hit.text();
+    if (!body || body.length < 20) return null;
+    cache = { at: 0, body };                              // present but stale -> refresh later
+    if (!Object.keys(lastByCity).length) {
+      try {
+        const j = JSON.parse(body);
+        const m: Record<string, Reading> = {};
+        for (const s of (j.stops || [])) m[s.city] = { T: s.T, h: s.h, k: s.k, i: s.i, a: s.a };
+        lastByCity = m;
+      } catch { /* ignore malformed */ }
+    }
+    return body;
+  } catch { return null; }
+}
+
+async function saveShared(body: string): Promise<void> {
+  try {
+    await caches.default.put(new Request(SHARED), new Response(body, {
+      headers: { "content-type": "application/json; charset=utf-8" },
+    }));
+  } catch { /* cache write is best-effort */ }
 }
 
 const empty = (): Reading => ({ T: null, h: null, k: null, i: null, a: null });
@@ -168,10 +205,12 @@ export function weatherCache(): { body: string; fresh: boolean } | null {
 // uses this to keep the cache warm; the request path calls it in the background.
 export function refreshWeather(): Promise<string> {
   if (inflight) return inflight;
+  lastAttempt = Date.now();
   inflight = (async () => {
     try {
       const body = await refresh(Date.now());
       cache = { at: Date.now(), body };
+      await saveShared(body);
       return body;
     } finally {
       inflight = null;
@@ -190,6 +229,27 @@ export async function getWeather(): Promise<string> {
   } catch {
     return c ? c.body : '{"updated":null,"stops":[]}';
   }
+}
+
+// Throttled background refresh for the request path (returns null when a build
+// is not due, so callers can skip the waitUntil).
+export function maybeRefresh(): Promise<string> | null {
+  if (Date.now() - lastAttempt < MIN_RETRY_MS) return null;
+  return refreshWeather();
+}
+
+// Resolve the payload for a request WITHOUT triggering a build: fresh module
+// cache -> stale module cache -> shared Cache-API last-good -> empty. Never
+// throws; the caller kicks a background refresh when `fresh` is false.
+export async function weatherForRequest(): Promise<{ body: string; fresh: boolean }> {
+  const c = weatherCache();
+  if (c && c.fresh) return c;
+  const shared = await loadShared();
+  if (shared) {
+    const c2 = weatherCache();
+    if (c2) return c2;
+  }
+  return { body: '{"updated":null,"stops":[]}', fresh: false };
 }
 
 // On-demand single-point reading (used by the widget's "search a city" flow).
