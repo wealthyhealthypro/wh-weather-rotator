@@ -239,12 +239,16 @@
     // used when the Worker's shared Cloudflare egress IP is rate-limited (429).
     function directFetch(list) {
       var out = list.map(function (s) { return { city: s.city, cc: s.cc || "", nature: !!s.nature, lat: s.lat, lon: s.lon, T: null, h: null, k: null, i: null, a: null }; });
+      function tf(url) {
+        var c = new AbortController(), t = setTimeout(function () { c.abort(); }, 10000);
+        return fetch(url, { signal: c.signal }).then(function (r) { clearTimeout(t); return r; }, function (e) { clearTimeout(t); throw e; });
+      }
       var tasks = [];
       for (var i = 0; i < list.length; i += 25) (function (off, arr) {
         tasks.push(function () {
           var lat = arr.map(function (s) { return s.lat; }).join(",");
           var lon = arr.map(function (s) { return s.lon; }).join(",");
-          return fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+          return tf("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
             "&current=temperature_2m,relative_humidity_2m,weather_code,is_day&forecast_days=1&timezone=UTC")
             .then(function (r) { return r.json(); }).then(function (j) {
               var a = Array.isArray(j) ? j : [j];
@@ -256,7 +260,7 @@
         tasks.push(function () {
           var lat = arr.map(function (s) { return s.lat; }).join(",");
           var lon = arr.map(function (s) { return s.lon; }).join(",");
-          return fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + lat + "&longitude=" + lon + "&current=us_aqi&timezone=UTC")
+          return tf("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + lat + "&longitude=" + lon + "&current=us_aqi&timezone=UTC")
             .then(function (r) { return r.json(); }).then(function (j) {
               var a = Array.isArray(j) ? j : [j];
               a.forEach(function (x, k) { if (x && x.current && x.current.us_aqi != null && out[off + k]) out[off + k].a = Math.round(x.current.us_aqi); });
@@ -300,6 +304,8 @@
             return;
           }
           // Worker upstream rate-limited/empty -> fetch Open-Meteo directly.
+          // Show the city list immediately; temps/AQI fill in a moment.
+          if (stops.length) apply(stops);
           var listP = stops.length
             ? Promise.resolve(stops)
             : fetch(BASE + "/api/cities").then(function (r) { return r.json(); }).then(function (c) { return (c && c.stops) || []; });
