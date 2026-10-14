@@ -98,13 +98,29 @@ the routes in `src/site/index.ts`, the header mount in `src/site/render.ts`, and
 
 ### 5.3 Cache & request path (non-blocking)
 
-- Module-scope `cache` holds the serialized payload + timestamp.
-- `weatherCache()` — synchronous accessor for the request path (never triggers a build).
-- `refreshWeather()` — build/refresh, deduped via a shared in-flight promise.
+Three tiers, so a visitor never waits on a build and a cold isolate still has data:
+
+1. **Module-scope `cache`** — the serialized payload + timestamp, per isolate.
+2. **Shared Cache API** — the last successful payload is written to `caches.default` under a
+   synthetic key (`https://wh-weather.internal/payload`). It survives cold isolates **and code
+   deploys**, so any edge location can serve the last build immediately. `loadShared()` reads it
+   and seeds `lastByCity` (so partial failures are carried forward).
+3. **Empty** — only on a truly first-ever request in a location.
+
+Accessors:
+
+- `weatherForRequest()` — async, request path: fresh module cache → stale module cache → shared
+  Cache API → empty. **Never** triggers a build.
+- `maybeRefresh()` — throttled (≥ 2 min) background rebuild; callers pass it to `ctx.waitUntil`.
+- `refreshWeather()` — build/refresh (deduped via a shared in-flight promise); writes the shared
+  Cache API copy.
 - `getWeather()` — awaiting accessor used by the cron.
-- **`/api/weather`** serves `weatherCache()` immediately (or an empty payload on a cold isolate)
-  and kicks `ctx.waitUntil(refreshWeather())` — a slow upstream **never** stalls a visitor.
-- The `*/5` cron refreshes when `minute % 20 === 0`, keeping the cache warm.
+
+**`/api/weather`** serves `weatherForRequest()` immediately and, when the payload is not fresh,
+kicks `maybeRefresh()` via `ctx.waitUntil` — a slow upstream **never** stalls a visitor, and cold
+isolates serve last-good rather than an empty body. The `*/5` cron refreshes when
+`minute % 20 === 0`, keeping both tiers warm.
+
 
 ### 5.4 Geocoding / point
 

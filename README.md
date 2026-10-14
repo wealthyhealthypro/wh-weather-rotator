@@ -55,8 +55,9 @@ Designed to stay well inside Cloudflare Workers' **free tier** and Open-Meteo's 
   **100-coord chunks**). Multi-location *forecast* is ~0.7 s per location server-side, hence
   the small chunks.
 - **Cadence** — forecast refreshed at most every **30 min**, AQI every **6 h**.
-- **Guards** — a hard **daily call cap**, exponential-ish last-good fallback, and an in-memory
-  cache; the request path is **non-blocking** (serves cache and refreshes in the background).
+- **Guards** — a hard **daily call cap**, last-good fallback, and a **shared Cache API** copy of
+  the last payload (survives cold isolates and deploys, so no empty headers); the request path is
+  **non-blocking** (serves cache/shared last-good and refreshes in the background, throttled).
 - **Endpoints** (implemented by the consuming Worker, not by this repo's code alone):
   `GET /api/weather`, `GET /api/geocode?q=`, `GET /api/point?lat=&lon=`.
 
