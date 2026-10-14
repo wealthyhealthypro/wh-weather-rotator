@@ -26,14 +26,14 @@
 
   // ── WMO weather_code -> inline SVG icon ───────────────────────────────────
   var ICON = {
-    sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#ffcf6b"/><g stroke="#ffcf6b" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="19.8" y1="4.2" x2="18" y2="6"/><line x1="6" y1="18" x2="4.2" y2="19.8"/></g></svg>',
-    moon: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z" fill="#dfe8f5"/></svg>',
-    partly: '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3.4" fill="#ffcf6b"/><path d="M9 19h8a3.5 3.5 0 0 0 .3-6.98A5 5 0 0 0 8 13a3 3 0 0 0 1 6z" fill="#c7d6ea"/></svg>',
-    cloud: '<svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 11 3.5 3.5 0 0 0 7 18z" fill="#c7d6ea"/></svg>',
-    fog: '<svg viewBox="0 0 24 24"><path d="M7 13h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 6 3.5 3.5 0 0 0 7 13z" fill="#c7d6ea"/><g stroke="#c7d6ea" stroke-width="2" stroke-linecap="round"><line x1="5" y1="17" x2="19" y2="17"/><line x1="7" y1="20" x2="17" y2="20"/></g></svg>',
-    rain: '<svg viewBox="0 0 24 24"><path d="M7 15h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 8 3.5 3.5 0 0 0 7 15z" fill="#c7d6ea"/><g stroke="#7fb3ff" stroke-width="2" stroke-linecap="round"><line x1="9" y1="18" x2="8" y2="21"/><line x1="13" y1="18" x2="12" y2="21"/><line x1="17" y1="18" x2="16" y2="21"/></g></svg>',
-    snow: '<svg viewBox="0 0 24 24"><path d="M7 15h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 8 3.5 3.5 0 0 0 7 15z" fill="#c7d6ea"/><g fill="#e8f0fb"><circle cx="9" cy="19" r="1.1"/><circle cx="13" cy="20" r="1.1"/><circle cx="16" cy="19" r="1.1"/></g></svg>',
-    thunder: '<svg viewBox="0 0 24 24"><path d="M7 14h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 7 3.5 3.5 0 0 0 7 14z" fill="#c7d6ea"/><path d="M12 14l-3 5h2.2l-1 4 4-6h-2.4l1.2-3z" fill="#ffcf6b"/></svg>'
+    sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="var(--wx-i-sun)"/><g stroke="var(--wx-i-sun)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="19.8" y1="4.2" x2="18" y2="6"/><line x1="6" y1="18" x2="4.2" y2="19.8"/></g></svg>',
+    moon: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z" fill="var(--wx-i-moon)"/></svg>',
+    partly: '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3.4" fill="var(--wx-i-sun)"/><path d="M9 19h8a3.5 3.5 0 0 0 .3-6.98A5 5 0 0 0 8 13a3 3 0 0 0 1 6z" fill="var(--wx-i-cloud)"/></svg>',
+    cloud: '<svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 11 3.5 3.5 0 0 0 7 18z" fill="var(--wx-i-cloud)"/></svg>',
+    fog: '<svg viewBox="0 0 24 24"><path d="M7 13h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 6 3.5 3.5 0 0 0 7 13z" fill="var(--wx-i-cloud)"/><g stroke="var(--wx-i-cloud)" stroke-width="2" stroke-linecap="round"><line x1="5" y1="17" x2="19" y2="17"/><line x1="7" y1="20" x2="17" y2="20"/></g></svg>',
+    rain: '<svg viewBox="0 0 24 24"><path d="M7 15h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 8 3.5 3.5 0 0 0 7 15z" fill="var(--wx-i-cloud)"/><g stroke="var(--wx-i-rain)" stroke-width="2" stroke-linecap="round"><line x1="9" y1="18" x2="8" y2="21"/><line x1="13" y1="18" x2="12" y2="21"/><line x1="17" y1="18" x2="16" y2="21"/></g></svg>',
+    snow: '<svg viewBox="0 0 24 24"><path d="M7 15h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 8 3.5 3.5 0 0 0 7 15z" fill="var(--wx-i-cloud)"/><g fill="var(--wx-i-snow)"><circle cx="9" cy="19" r="1.1"/><circle cx="13" cy="20" r="1.1"/><circle cx="16" cy="19" r="1.1"/></g></svg>',
+    thunder: '<svg viewBox="0 0 24 24"><path d="M7 14h10a4 4 0 0 0 .4-7.98A6 6 0 0 0 5.7 7 3.5 3.5 0 0 0 7 14z" fill="var(--wx-i-cloud)"/><path d="M12 14l-3 5h2.2l-1 4 4-6h-2.4l1.2-3z" fill="var(--wx-i-sun)"/></svg>'
   };
   function icon(code, isDay) {
     if (code == null) return "";
@@ -50,7 +50,7 @@
   function aqiClass(a) { return a <= 50 ? "good" : a <= 100 ? "mod" : "bad"; }
 
   var CSS = "" +
-    ":host{all:initial;display:inline-block;font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--wx-ink,#243b45);}" +
+    ":host{all:initial;display:inline-block;font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--wx-ink,#243b45);--wx-i-sun:#A9760B;--wx-i-cloud:#5B7280;--wx-i-moon:#5B7280;--wx-i-snow:#5B7280;--wx-i-rain:#2B6CB0;}" +
     ".root{display:inline-flex;align-items:center;gap:7px;opacity:0;transition:opacity .35s ease;}" +
     ".root.show{opacity:1;}" +
     ".wx{display:flex;align-items:center;gap:7px;min-height:30px;min-width:210px;white-space:nowrap;" +
@@ -85,10 +85,10 @@
       "padding:7px 9px;font:inherit;font-size:12px;cursor:pointer;color:inherit;}" +
     ".res button:hover{background:rgba(127,160,175,.14);}" +
     ".res .c{color:var(--wx-soft,#5b7280);font-size:11px;}" +
-    ":host(.wx-dark){--wx-ink:#e7eef2;--wx-soft:#9fb3bd;--wx-bg:#1b2429;--wx-line:#33454e;}" +
+    ":host(.wx-dark){--wx-ink:#e7eef2;--wx-soft:#9fb3bd;--wx-bg:#1b2429;--wx-line:#33454e;--wx-i-sun:#ffcf6b;--wx-i-cloud:#c7d6ea;--wx-i-moon:#dfe8f5;--wx-i-snow:#e8f0fb;--wx-i-rain:#7fb3ff;}" +
     // Bright temp/AQI colours for dark pages (AA >=4.5:1 on the dark background).
-    ":host(.wx-dark) .t.frz{color:#7fb3ff;}:host(.wx-dark) .t.cold{color:#8fd0ff;}:host(.wx-dark) .t.mild{color:#4fd99a;}:host(.wx-dark) .t.hot{color:#ffcf6b;}:host(.wx-dark) .t.ext{color:#ff7f66;}" +
-    ":host(.wx-dark) .aqi.good{color:#4fd99a;}:host(.wx-dark) .aqi.mod{color:#ffcf6b;}:host(.wx-dark) .aqi.bad{color:#ff7f66;}" +
+    ":host(.wx-dark) .t.frz{color:var(--wx-i-rain);}:host(.wx-dark) .t.cold{color:#8fd0ff;}:host(.wx-dark) .t.mild{color:#4fd99a;}:host(.wx-dark) .t.hot{color:var(--wx-i-sun);}:host(.wx-dark) .t.ext{color:#ff7f66;}" +
+    ":host(.wx-dark) .aqi.good{color:#4fd99a;}:host(.wx-dark) .aqi.mod{color:var(--wx-i-sun);}:host(.wx-dark) .aqi.bad{color:#ff7f66;}" +
     "@media (max-width:640px){.wx{min-width:0;}.city{max-width:88px;}.h{display:none;}}";
 
   function el(tag, cls, txt) {
