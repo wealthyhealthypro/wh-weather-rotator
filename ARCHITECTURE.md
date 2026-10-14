@@ -43,7 +43,7 @@ Design goals, in priority order:
   └──────────────────────────────┬───────────────────────────────────┘
                                  ▼
              weather-client.js  (drop-in Shadow-DOM widget)
-             mounted at  <div id="hdr-wx">  in each site's header
+             mounted at  <div id="hdr-wx">  in each site's top strip (far-left)
                                  │
    bitcoin / macro (same-origin) · jobs · deals · socials (cross-origin; CSP allowlist)
 ```
@@ -155,8 +155,8 @@ These are the Worker's **only CORS-enabled routes** — read-only GET, no creden
 
 ## 8. Integration (adding a surface)
 
-1. Add `<div id="hdr-wx" aria-label="Weather and air quality"></div>` where you want it (far-left
-   of the header).
+1. Add `<div id="hdr-wx" aria-label="Weather and air quality"></div>` in the site's **top strip**,
+   far-left (inline with the clock, which sits on the right).
 2. Add `<script src="https://macro.wealthyhealthy.pro/weather.js" async></script>`.
 3. Allowlist the host in CSP — `script-src … https://macro.wealthyhealthy.pro` and
    `connect-src … https://macro.wealthyhealthy.pro` (`img-src … https:`, already present on all
