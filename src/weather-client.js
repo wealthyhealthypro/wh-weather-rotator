@@ -239,30 +239,36 @@
     // used when the Worker's shared Cloudflare egress IP is rate-limited (429).
     function directFetch(list) {
       var out = list.map(function (s) { return { city: s.city, cc: s.cc || "", nature: !!s.nature, lat: s.lat, lon: s.lon, T: null, h: null, k: null, i: null, a: null }; });
-      var chs = [];
-      for (var i = 0; i < list.length; i += 25) chs.push({ off: i, arr: list.slice(i, i + 25) });
-      var fc = chs.map(function (ch) {
-        var lat = ch.arr.map(function (s) { return s.lat; }).join(",");
-        var lon = ch.arr.map(function (s) { return s.lon; }).join(",");
-        return fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
-          "&current=temperature_2m,relative_humidity_2m,weather_code,is_day&forecast_days=1&timezone=UTC")
-          .then(function (r) { return r.json(); }).then(function (j) {
-            var a = Array.isArray(j) ? j : [j];
-            ch.arr.forEach(function (s, k) { var c = a[k] && a[k].current; if (c) { var o = out[ch.off + k]; o.T = c.temperature_2m; o.h = c.relative_humidity_2m; o.k = c.weather_code; o.i = c.is_day; } });
-          }).catch(function () {});
-      });
-      var aqiChs = [];
-      for (var r = 0; r < list.length; r += 100) aqiChs.push({ off: r, arr: list.slice(r, r + 100) });
-      var aq = aqiChs.map(function (ch) {
-        var lat = ch.arr.map(function (s) { return s.lat; }).join(",");
-        var lon = ch.arr.map(function (s) { return s.lon; }).join(",");
-        return fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + lat + "&longitude=" + lon + "&current=us_aqi&timezone=UTC")
-          .then(function (r) { return r.json(); }).then(function (j) {
-            var a = Array.isArray(j) ? j : [j];
-            a.forEach(function (x, k) { if (x && x.current && x.current.us_aqi != null && out[ch.off + k]) out[ch.off + k].a = Math.round(x.current.us_aqi); });
-          }).catch(function () {});
-      });
-      return Promise.all(fc.concat(aq)).then(function () { return out; });
+      var tasks = [];
+      for (var i = 0; i < list.length; i += 25) (function (off, arr) {
+        tasks.push(function () {
+          var lat = arr.map(function (s) { return s.lat; }).join(",");
+          var lon = arr.map(function (s) { return s.lon; }).join(",");
+          return fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon +
+            "&current=temperature_2m,relative_humidity_2m,weather_code,is_day&forecast_days=1&timezone=UTC")
+            .then(function (r) { return r.json(); }).then(function (j) {
+              var a = Array.isArray(j) ? j : [j];
+              arr.forEach(function (s, k) { var c = a[k] && a[k].current; if (c) { var o = out[off + k]; o.T = c.temperature_2m; o.h = c.relative_humidity_2m; o.k = c.weather_code; o.i = c.is_day; } });
+            }).catch(function () {});
+        });
+      })(i, list.slice(i, i + 25));
+      for (var r = 0; r < list.length; r += 100) (function (off, arr) {
+        tasks.push(function () {
+          var lat = arr.map(function (s) { return s.lat; }).join(",");
+          var lon = arr.map(function (s) { return s.lon; }).join(",");
+          return fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + lat + "&longitude=" + lon + "&current=us_aqi&timezone=UTC")
+            .then(function (r) { return r.json(); }).then(function (j) {
+              var a = Array.isArray(j) ? j : [j];
+              a.forEach(function (x, k) { if (x && x.current && x.current.us_aqi != null && out[off + k]) out[off + k].a = Math.round(x.current.us_aqi); });
+            }).catch(function () {});
+        });
+      })(r, list.slice(r, r + 100));
+      // Bounded concurrency (avoid an Open-Meteo burst 429).
+      var idx = 0, LIMIT = 4;
+      function next() { if (idx >= tasks.length) return Promise.resolve(); return tasks[idx++]().then(next, next); }
+      var starters = [];
+      for (var j = 0; j < Math.min(LIMIT, tasks.length); j++) starters.push(next());
+      return Promise.all(starters).then(function () { return out; });
     }
 
     function apply(list) {
