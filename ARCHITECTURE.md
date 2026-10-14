@@ -191,3 +191,20 @@ edit data/cities.json
   → in wh-macro: npm run sync:weather    (vendors data + engine + widget)
   → npm run typecheck → commit + push    (auto-deploys)
 ```
+
+## 12. Rendering QA (required)
+
+The widget is embedded in site headers, so **every** change must be render-tested across all
+target engines and both viewports before shipping — never assume Chrome behaviour:
+
+| Engine | Covers | Viewports |
+|---|---|---|
+| `chromium` | Chrome desktop/mobile, Edge desktop | ~1366 px + ~390 px |
+| `firefox` | Firefox Windows + Android | ~1366 px + ~390 px |
+| `webkit` | Safari desktop + mobile | ~1366 px + ~390 px |
+
+Check for: horizontal overflow (`scrollWidth > clientWidth`), visual overlap/breakage, console/
+network errors, and that the widget actually renders data. The historical failure mode was the
+widget's width squeezing a header brand (`min-width:0` + `flex-shrink:0` nav) into the nav — hosts
+must allow the header to **wrap** (and give the brand `flex:0 0 auto`).
+
