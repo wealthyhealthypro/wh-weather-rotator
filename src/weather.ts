@@ -95,7 +95,12 @@ async function loadShared(): Promise<string | null> {
     if (!hit) return null;
     const body = await hit.text();
     if (!body || body.length < 20) return null;
-    cache = { at: 0, body };                              // present but stale -> refresh later
+    // Preserve the payload's real freshness so a cold isolate serving a recent
+    // shared copy does NOT trigger a rebuild (that rebuild storm is what blows
+    // the daily quota).
+    let at = 0;
+    try { const u = JSON.parse(body).updated; if (u) at = Date.parse(u) || 0; } catch { /* ignore */ }
+    cache = { at, body };
     if (!Object.keys(lastByCity).length) {
       try {
         const j = JSON.parse(body);
@@ -281,6 +286,11 @@ export async function pointWeather(lat: number, lon: number): Promise<Reading> {
   }
   return out;
 }
+
+// Static city list (city/lat/lon/cc/nature) — served at GET /api/cities so the
+// widget can run its own Open-Meteo fetch (visitor IP) if the Worker's upstream
+// is rate-limited (shared Cloudflare egress IP hitting Open-Meteo's daily cap).
+export function weatherCities(): WxStop[] { return WEATHER_STOPS; }
 
 // ── Geocoding (on-demand place search; cached in-memory per isolate) ─────────
 export interface GeoHit { name: string; country: string; cc: string; lat: number; lon: number; }
