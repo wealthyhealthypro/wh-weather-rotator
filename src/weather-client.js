@@ -61,12 +61,14 @@
     ".nat{font-size:13px;line-height:1;flex:0 0 auto;}" +
     ".city{font-weight:700;letter-spacing:.01em;color:var(--wx-ink,#1c2b33);overflow:hidden;text-overflow:ellipsis;}" +
     ".t{font-weight:700;}" +
-    ".t.frz{color:#7fb3ff;}.t.cold{color:#8fd0ff;}.t.mild{color:#4fd99a;}.t.hot{color:#ffcf6b;}.t.ext{color:#ff7f66;}" +
+    // Temperature colours: dark enough to clear WCAG AA (>=4.5:1) on the LIGHT
+    // pages by default; the bright originals are restored under :host(.wx-dark).
+    ".t.frz{color:#1E63C4;}.t.cold{color:#0A6FA8;}.t.mild{color:#127A43;}.t.hot{color:#8A6B00;}.t.ext{color:#A24E12;}" +
     ".h{color:var(--wx-soft,#5b7280);font-size:11.5px;}" +
     ".aqi{font-size:11px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:10px;}" +
-    ".aqi.good{background:rgba(79,217,154,.16);color:#1f9e6a;}" +
-    ".aqi.mod{background:rgba(255,207,107,.22);color:#a9791a;}" +
-    ".aqi.bad{background:rgba(255,127,102,.20);color:#c0432c;}" +
+    ".aqi.good{background:rgba(79,217,154,.16);color:#0E7040;}" +
+    ".aqi.mod{background:rgba(255,207,107,.22);color:#7E6200;}" +
+    ".aqi.bad{background:rgba(255,127,102,.20);color:#A03018;}" +
     ".btn{border:0;background:none;padding:0;margin:0;cursor:pointer;color:var(--wx-soft,#5b7280);" +
       "font-size:14px;line-height:1;flex:0 0 auto;}" +
     ".btn:hover{color:var(--wx-ink,#1c2b33);}" +
@@ -84,6 +86,9 @@
     ".res button:hover{background:rgba(127,160,175,.14);}" +
     ".res .c{color:var(--wx-soft,#5b7280);font-size:11px;}" +
     ":host(.wx-dark){--wx-ink:#e7eef2;--wx-soft:#9fb3bd;--wx-bg:#1b2429;--wx-line:#33454e;}" +
+    // Bright temp/AQI colours for dark pages (AA >=4.5:1 on the dark background).
+    ":host(.wx-dark) .t.frz{color:#7fb3ff;}:host(.wx-dark) .t.cold{color:#8fd0ff;}:host(.wx-dark) .t.mild{color:#4fd99a;}:host(.wx-dark) .t.hot{color:#ffcf6b;}:host(.wx-dark) .t.ext{color:#ff7f66;}" +
+    ":host(.wx-dark) .aqi.good{color:#4fd99a;}:host(.wx-dark) .aqi.mod{color:#ffcf6b;}:host(.wx-dark) .aqi.bad{color:#ff7f66;}" +
     "@media (max-width:640px){.wx{min-width:0;}.city{max-width:88px;}.h{display:none;}}";
 
   function el(tag, cls, txt) {
