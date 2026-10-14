@@ -41,6 +41,10 @@ const AQI_CHUNK = 100;                   // air-quality coords/request (fast per
 const CONCURRENCY = 6;                   // max simultaneous subrequests (Workers cap = 6)
 const MAX_CALLS_PER_DAY = 3000;          // hard quota guard (10k/day cap)
 const TIMEOUT_MS = 20000;
+// Minimum number of stops that must carry a fresh temperature for a build to be
+// accepted. Protects the shared last-good from being clobbered by an all-null
+// build (transient upstream outage / rate-limit) — the classic "rotator blank".
+const MIN_VALID = Math.floor(WEATHER_STOPS.length * 0.3);
 
 // ── module-scope state (per isolate; the Cache API / edge cache is the shared tier)
 let cache: { at: number; body: string } | null = null;
@@ -184,6 +188,7 @@ async function fetchAqi(stops: WxStop[], out: Record<string, Reading>): Promise<
 }
 
 async function refresh(now: number): Promise<string> {
+  if (!Object.keys(lastByCity).length) await loadShared();   // seed a cold isolate from shared last-good
   const out: Record<string, Reading> = { ...lastByCity };
   await fetchForecast(WEATHER_STOPS, out);
   const withAqi = now - lastAqiAt >= AQI_MS;
@@ -191,6 +196,8 @@ async function refresh(now: number): Promise<string> {
     await fetchAqi(WEATHER_STOPS, out);
     lastAqiAt = now;
   }
+  const valid = WEATHER_STOPS.reduce((n, s) => n + ((out[s.city]?.T ?? null) != null ? 1 : 0), 0);
+  if (valid < MIN_VALID) throw new Error(`weather build too sparse (${valid}/${WEATHER_STOPS.length})`);
   lastByCity = out;
   const stops: StopOut[] = WEATHER_STOPS.map((s) => ({ ...s, ...(out[s.city] ?? empty()) }));
   return JSON.stringify({ updated: new Date(now).toISOString(), stops });
