@@ -22,7 +22,11 @@
   var SESSION_MS = 10 * 60 * 1000;  // reuse a fetched payload for 10 min
   var SKEY = "wh-wx-cache", PKEY = "wh-wx-pins";
   var ROTATE = "\u25B8";            // small chevron
-  var TREES = ["\uD83C\uDF32", "\uD83C\uDF3F"]; // 🌲 🌿
+  var TREES = ["\uD83C\uDF32", "\uD83C\uDF33"]; // 🌲 🌳 (dark-green only; 🌿 washed out on light)
+
+  // Search glyph as an inline SVG (theme-aware via currentColor) instead of the
+  // platform-coloured 🔍 emoji, so it stays crisp and legible on both themes.
+  var MAG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.6" cy="10.6" r="6.1" fill="none" stroke="currentColor" stroke-width="2.1"/><line x1="15.3" y1="15.3" x2="20.4" y2="20.4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
 
   // ── WMO weather_code -> inline SVG icon ───────────────────────────────────
   var ICON = {
@@ -71,6 +75,7 @@
     ".aqi.bad{background:rgba(255,127,102,.20);color:#A03018;}" +
     ".btn{border:0;background:none;padding:0;margin:0;cursor:pointer;color:var(--wx-soft,#5b7280);" +
       "font-size:14px;line-height:1;flex:0 0 auto;}" +
+    ".btn svg{width:15px;height:15px;display:block;}" +
     ".btn:hover{color:var(--wx-ink,#1c2b33);}" +
     ".srch{position:relative;flex:0 0 auto;}" +
     ".inp{position:absolute;top:24px;left:0;z-index:5;width:210px;padding:6px 8px;font:inherit;font-size:12px;" +
@@ -109,7 +114,8 @@
 
     // search control
     var srch = el("div", "srch");
-    var btn = el("button", "btn", "\uD83D\uDD0D");
+    var btn = el("button", "btn");
+    btn.innerHTML = MAG;
     btn.type = "button";
     btn.setAttribute("aria-label", "Search a city");
     var inp = el("input", "inp");
