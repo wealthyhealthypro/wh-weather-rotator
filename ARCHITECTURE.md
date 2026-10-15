@@ -150,8 +150,9 @@ These are the Worker's **only CORS-enabled routes** — read-only GET, no creden
   `localStorage`, max 5) at the front of the rotation.
 - If the first payload is empty (cold worker), it **retries after 30 s**.
 - All external strings use `textContent`; icons are inline SVG; **no emoji-font dependency** for
-  the weather glyphs (the nature marker is an emoji, which renders on all platforms except it is
-  intentionally decorative).
+  the weather glyphs. **Theme-aware contrast:** the weather-icon fills, the temperature/AQI colours,
+  the search glyph (inline SVG, `currentColor`) and the nature emoji (dark-green 🌲/🌳 only — the pale
+  🌿 washed out on light) all key off the host theme (`data-theme`) for AA contrast on light and dark.
 
 ## 8. Integration (adding a surface)
 
